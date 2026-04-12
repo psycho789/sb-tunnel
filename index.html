@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SizeNova tunnel</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; line-height: 1.5; color: #111; background: #fafafa; }
+    body { max-width: 36rem; margin: 2rem auto; padding: 0 1rem; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1.25rem; }
+    .badge { margin: 1rem 0; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.95rem; }
+    .badge.ok { background: #e8f5e9; border: 1px solid #4caf50; }
+    .badge.bad { background: #ffebee; border: 1px solid #e57373; }
+    .live { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; }
+    .live .pending { color: #666; }
+    .live span.ok { color: #2e7d32; font-weight: 600; }
+    .live span.bad { color: #c62828; font-weight: 600; }
+    a.button { display: inline-block; margin-top: 0.75rem; padding: 0.5rem 1rem; background: #1976d2;
+      color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; }
+    a.button:hover { background: #1565c0; }
+    footer { margin-top: 2rem; font-size: 0.85rem; color: #666; }
+    code { font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>SizeNova tunnel</h1>
+    <p>Hostnames change when you recreate TryCloudflare. Updated by <code>sb/scripts/share-demo.sh</code>.</p>
+    <p><strong>Generated:</strong> 2026-04-12T05:34:22Z UTC</p>
+    <p class="badge ok"><strong>App (tunnel):</strong> Reachable (verified when share-demo ran)</p>
+    <p><a class="button" href="https://dui-searched-patches-enquiries.trycloudflare.com/">Open app</a></p>
+    <div class="live">
+      <h2>From this browser</h2>
+      <p class="pending" id="hint">Checking…</p>
+      <p>Status: <span id="live-web" class="pending">…</span></p>
+      <p><button type="button" id="recheck">Recheck</button></p>
+    </div>
+  </div>
+  <footer>
+    <p>This page: https://psycho789.github.io/sb-tunnel/</p>
+  </footer>
+  <script>
+(function () {
+  const WEB = "https://dui-searched-patches-enquiries.trycloudflare.com";
+
+  function setWeb(text, ok) {
+    const el = document.getElementById("live-web");
+    el.textContent = text;
+    el.className = ok === true ? "ok" : ok === false ? "bad" : "pending";
+  }
+
+  function probeWeb(done) {
+    const ifr = document.createElement("iframe");
+    ifr.style.cssText = "position:fixed;width:0;height:0;left:-9999px;border:0;opacity:0";
+    let settled = false;
+    const finish = function (st) {
+      if (settled) return;
+      settled = true;
+      try { document.body.removeChild(ifr); } catch (e) {}
+      done(st);
+    };
+    const t = setTimeout(function () { finish("no response (timeout)"); }, 25000);
+    ifr.onload = function () { clearTimeout(t); finish("reachable"); };
+    document.body.appendChild(ifr);
+    ifr.src = WEB + "/?tunnelProbe=" + Date.now();
+  }
+
+  function run() {
+    document.getElementById("hint").textContent = "Loading tunnel in a hidden frame…";
+    setWeb("…", null);
+    probeWeb(function (w) {
+      const wok = w === "reachable";
+      setWeb(w, wok);
+      document.getElementById("hint").textContent = "";
+    });
+  }
+
+  document.getElementById("recheck").addEventListener("click", run);
+  run();
+})();
+  </script>
+</body>
+</html>
