@@ -1,0 +1,9 @@
+{
+  "name": "sb-tunnel",
+  "private": true,
+  "version": "0.0.0",
+  "description": "GitHub Pages host for SizeNova share-demo tunnel pointer (deployed by sb/scripts/share-demo.sh)",
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
+  }
+}
