@@ -15,9 +15,9 @@
     .live .pending { color: #666; }
     .live span.ok { color: #2e7d32; font-weight: 600; }
     .live span.bad { color: #c62828; font-weight: 600; }
-    a.button { display: inline-block; margin-top: 0.75rem; padding: 0.5rem 1rem; background: #1976d2;
-      color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; }
-    a.button:hover { background: #1565c0; }
+    .tunnel-url { margin: 0.75rem 0; font-size: 0.95rem; word-break: break-all; }
+    .tunnel-url a { color: #1565c0; font-weight: 600; }
+    .tunnel-url a:hover { text-decoration: underline; }
     footer { margin-top: 2rem; font-size: 0.85rem; color: #666; }
     code { font-size: 0.9em; }
   </style>
@@ -26,9 +26,12 @@
   <div class="card">
     <h1>SizeNova tunnel</h1>
     <p>Hostnames change when you recreate TryCloudflare. Updated by <code>sb/scripts/share-demo.sh</code>.</p>
-    <p><strong>Generated:</strong> 2026-04-12T05:34:22Z UTC</p>
+    <p><strong>Generated:</strong> 2026-04-12T05:45:32Z UTC</p>
     <p class="badge ok"><strong>App (tunnel):</strong> Reachable (verified when share-demo ran)</p>
-    <p><a class="button" href="https://dui-searched-patches-enquiries.trycloudflare.com/">Open app</a></p>
+    <p class="tunnel-url">
+      <a href="https://hill-documents-tourism-ordering.trycloudflare.com/" target="_blank" rel="noopener noreferrer">https://hill-documents-tourism-ordering.trycloudflare.com/</a>
+    </p>
+    <p class="muted" style="font-size:0.85rem;color:#666;">Opens in a new tab.</p>
     <div class="live">
       <h2>From this browser</h2>
       <p class="pending" id="hint">Checking…</p>
@@ -41,7 +44,7 @@
   </footer>
   <script>
 (function () {
-  const WEB = "https://dui-searched-patches-enquiries.trycloudflare.com";
+  const WEB = "https://hill-documents-tourism-ordering.trycloudflare.com";
 
   function setWeb(text, ok) {
     const el = document.getElementById("live-web");
