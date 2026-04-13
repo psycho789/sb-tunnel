@@ -9,8 +9,7 @@
     body { max-width: 36rem; margin: 2rem auto; padding: 0 1rem; }
     .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1.25rem; }
     .badge { margin: 1rem 0; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.95rem; }
-    .badge.ok { background: #e8f5e9; border: 1px solid #4caf50; }
-    .badge.bad { background: #ffebee; border: 1px solid #e57373; }
+    .badge.meta { background: #f5f5f5; border: 1px solid #bdbdbd; color: #424242; }
     .live { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; }
     .live .pending { color: #666; }
     .live span.ok { color: #2e7d32; font-weight: 600; }
@@ -26,15 +25,16 @@
   <div class="card">
     <h1>SizeNova tunnel</h1>
     <p>Hostnames change when you recreate TryCloudflare. Updated by <code>sb/scripts/share-demo.sh</code>.</p>
-    <p><strong>Generated:</strong> 2026-04-13T00:13:17Z UTC</p>
-    <p class="badge ok"><strong>App (tunnel):</strong> Reachable (verified when share-demo ran)</p>
+    <p><strong>Generated:</strong> 2026-04-13T05:24:15Z UTC</p>
+    <p class="badge meta"><strong>Deploy-time only (not live):</strong> curl got HTTP 200 for the tunnel <code>/</code> when share-demo ran.</p>
     <p class="tunnel-url">
-      <a href="https://seventh-fantasy-dresses-receiving.trycloudflare.com/" target="_blank" rel="noopener noreferrer">https://seventh-fantasy-dresses-receiving.trycloudflare.com/</a>
+      <a href="https://optics-etc-centers-attitudes.trycloudflare.com/" target="_blank" rel="noopener noreferrer">https://optics-etc-centers-attitudes.trycloudflare.com/</a>
     </p>
     <p class="muted" style="font-size:0.85rem;color:#666;">Opens in a new tab.</p>
     <div class="live">
-      <h2>From this browser</h2>
+      <h2>Live check (this browser)</h2>
       <p class="pending" id="hint">Checking…</p>
+      <p>Runs on each full page load and when you use Recheck. Uses <code>GET …/tunnel-probe.json</code> (CORS), not an iframe — the app uses <code>frame-ancestors 'none'</code>, so iframe probes from this page are unreliable.</p>
       <p>Status: <span id="live-web" class="pending">…</span></p>
       <p><button type="button" id="recheck">Recheck</button></p>
     </div>
@@ -44,7 +44,7 @@
   </footer>
   <script>
 (function () {
-  const WEB = "https://seventh-fantasy-dresses-receiving.trycloudflare.com";
+  const WEB = "https://optics-etc-centers-attitudes.trycloudflare.com";
 
   function setWeb(text, ok) {
     const el = document.getElementById("live-web");
@@ -52,33 +52,44 @@
     el.className = ok === true ? "ok" : ok === false ? "bad" : "pending";
   }
 
-  function probeWeb(done) {
-    const ifr = document.createElement("iframe");
-    ifr.style.cssText = "position:fixed;width:0;height:0;left:-9999px;border:0;opacity:0";
-    let settled = false;
-    const finish = function (st) {
-      if (settled) return;
-      settled = true;
-      try { document.body.removeChild(ifr); } catch (e) {}
-      done(st);
-    };
-    const t = setTimeout(function () { finish("no response (timeout)"); }, 25000);
-    ifr.onload = function () { clearTimeout(t); finish("reachable"); };
-    document.body.appendChild(ifr);
-    ifr.src = WEB + "/?tunnelProbe=" + Date.now();
+  function probeTunnel(done) {
+    const ctrl = new AbortController();
+    const t = setTimeout(function () { ctrl.abort(); }, 20000);
+    const url = WEB + "/tunnel-probe.json?t=" + Date.now();
+    fetch(url, { method: "GET", mode: "cors", cache: "no-store", signal: ctrl.signal })
+      .then(function (r) {
+        clearTimeout(t);
+        if (!r.ok) {
+          done(false, "HTTP " + r.status);
+          return null;
+        }
+        return r.json();
+      })
+      .then(function (j) {
+        if (j === null) return;
+        if (j && j.ok === true) done(true, "Reachable");
+        else done(false, "Unexpected JSON");
+      })
+      .catch(function (e) {
+        clearTimeout(t);
+        if (e && e.name === "AbortError") done(false, "Timeout (20s)");
+        else done(false, "Unreachable (network or CORS)");
+      });
   }
 
   function run() {
-    document.getElementById("hint").textContent = "Loading tunnel in a hidden frame…";
+    document.getElementById("hint").textContent = "Requesting tunnel-probe.json…";
     setWeb("…", null);
-    probeWeb(function (w) {
-      const wok = w === "reachable";
-      setWeb(w, wok);
+    probeTunnel(function (ok, msg) {
+      setWeb(msg, ok);
       document.getElementById("hint").textContent = "";
     });
   }
 
   document.getElementById("recheck").addEventListener("click", run);
+  window.addEventListener("pageshow", function (ev) {
+    if (ev.persisted) run();
+  });
   run();
 })();
   </script>
