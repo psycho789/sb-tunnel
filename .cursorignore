@@ -1,0 +1,8 @@
+# Reduce Cursor indexing noise; keeps package.json, package-lock.json, last-deploy.json.
+
+.git/
+
+node_modules/
+
+.DS_Store
+Thumbs.db
