@@ -1,0 +1,15 @@
+{
+  "name": "sb-tunnel",
+  "private": true,
+  "version": "0.0.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "verify": "node scripts/verify-last-deploy.mjs",
+    "clean": "rm -rf node_modules"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
+  }
+}
